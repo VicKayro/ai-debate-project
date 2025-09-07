@@ -1,0 +1,10 @@
+# Environnement virtuel
+agent_env/
+__pycache__/
+*.pyc
+
+# Clés et variables secrètes
+.env
+
+# Autres
+*.DS_Store
