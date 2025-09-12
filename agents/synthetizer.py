@@ -1,18 +1,18 @@
-from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
-from langchain_openai import ChatOpenAI
+from utils.llm import chat
 
-def get_synthesizer_agent():
-    system_prompt = """Tu es un expert en communication stratégique. Ta mission est de lire un débat multi-agent, et de générer :
-- un résumé clair et structuré des idées clés de chaque agent
-- les contradictions ou divergences de points de vue
-- une recommandation finale, en tenant compte de toutes les perspectives
+def synthesize(question: str, thread: list[dict]) -> str:
+    convo = "\n".join([f"{m['speaker']}: {m['text']}" for m in thread])
+    prompt = f"""
+Tu es facilitateur. Fais une synthèse **très concise** du débat sur: "{question}"
 
-Réponds en français, en étant clair, synthétique et percutant."""
+Donne:
+- 2 points d'accord max
+- 2 points de désaccord max
+- 3 actions concrètes (qui/quoi/quand si possible)
 
-    prompt = ChatPromptTemplate.from_messages([
-        SystemMessagePromptTemplate.from_template(system_prompt),
-        HumanMessagePromptTemplate.from_template("{input}")
-    ])
+Débat:
+{convo}
 
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.5)
-    return prompt | llm
+Réponse en 6 lignes max, puces courtes.
+"""
+    return chat(prompt, temperature=0.2, max_tokens=220)
